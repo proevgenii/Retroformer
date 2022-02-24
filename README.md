@@ -1,5 +1,5 @@
 # Retroformer
-This is the directory for the work https://arxiv.org/abs/2201.12475.
+This is the directory of the work [https://arxiv.org/abs/2201.12475](Retroformer: Pushing the Limits of Interpretable End-to-end Retrosynthesis Transformer).
 
 ## Dependency:
 Follow the below steps for dependency installation:
