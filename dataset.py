@@ -19,11 +19,6 @@ from utils.smiles_utils import canonical_smiles, canonical_smiles_with_am, remov
 def gaussian(x, mean, amplitude, standard_deviation):
     return amplitude * np.exp(- (x - mean) ** 2 / (2 * standard_deviation ** 2))
 
-def prior_prob(x):
-    with open('../retroAttn_dataset/intermediate/size2prob.pk', 'rb') as f:
-        size2prob = pickle.load(f)
-    return size2prob.get(x, 0)
-
 
 class RetroDataset(Dataset):
     def __init__(self, mode, data_folder='./data', intermediate_folder='./intermediate',
@@ -48,16 +43,12 @@ class RetroDataset(Dataset):
 
         self.augmentation = None
         if augment:
-            # with open(os.path.join(data_folder, 'augmented_reactions.pk'), 'rb') as f:
-            #     self.augmentation = pickle.load(f)
             self.augmentation = 'True'
 
         if mode != 'train':
             assert vocab_file in os.listdir(intermediate_folder)
             with open(os.path.join(intermediate_folder, vocab_file), 'rb') as f:
                 self.src_itos, self.tgt_itos = pickle.load(f)
-            with open(os.path.join(intermediate_folder, 'co-occur.pk'), 'rb') as f:
-                self.co_occur_matrix = pickle.load(f)
             self.src_stoi = {self.src_itos[i]: i for i in range(len(self.src_itos))}
             self.tgt_stoi = {self.tgt_itos[i]: i for i in range(len(self.tgt_itos))}
             self.data = pd.read_csv(os.path.join(data_folder, 'raw_{}.csv'.format(mode)))
@@ -119,7 +110,6 @@ class RetroDataset(Dataset):
             self.src, self.src_graph, self.tgt, self.context_alignment, self.nonreactive_mask = \
                 self.parse_raw_data(self.data)
 
-        # self.factor_func = lambda x: (1 + prior_prob(x))
         self.factor_func = lambda x: (1 + gaussian(x, 5.55391565, 0.27170542, 1.20071279)) # pre-computed
 
     def filter_data_helper(self, task):
@@ -262,17 +252,6 @@ class RetroDataset(Dataset):
             return [self.src_itos[t] for t in tokens if t != 1]
         else:
             return [self.tgt_itos[t] for t in tokens if t not in [1, 2, 3]]
-
-    def convert_src_to_tgt_indices(self, src_token_idx):
-        src_token = self.src_itos[src_token_idx]
-        # try:
-        #     src_token = [atom.GetSymbol() for atom in Chem.MolFromSmiles(src_token).GetAtoms()][0]
-        # except:
-        #     pass
-        if src_token in ['[N@+]', '[N@@+]']:
-            src_token = '[N+]'
-        tgt_index = self.tgt_stoi.get(src_token, self.tgt_stoi['<unk>'])
-        return tgt_index
 
     def __len__(self):
         return len(self.data)

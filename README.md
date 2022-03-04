@@ -40,12 +40,13 @@ Retroformer/
 ```
 
 ## Data:
-Download the raw reaction dataset from [here](https://github.com/Hanjun-Dai/GLN) and put it into your data directory. You can also create your own reaction dataset as long as the data shares the same format (columns: `id`, `class`, `reactants>reagents>production`) and the reactions are atom-mapped.  
+Download the raw reaction dataset from [here](https://github.com/Hanjun-Dai/GLN) and put it into your data directory. You can also create your own reaction dataset as long as the data shares the same format (columns: `id`, `class`, `reactants>reagents>production`) and the reactions are atom-mapped. 
 
 ## Train:
 One can specify different model and training configurations in `start.sh`. Below is a sample code that calls `train.py`. Simply run `./start.sh` for training.
 
-Data processing is done at the stage of building data iterator. If the training is called for the first time, it will take extra time to buildup vocab file and save it to `/intermediate/vocab.pk`.
+Data processing is done at the stage of building data iterator. If the training is called for the first time, it will take extra time to buildup vocab file and save it to `/intermediate/vocab.pk`. You can either build the vocab from scratch or download the built vocab from [GoogleDrive](https://drive.google.com/drive/folders/1kiar6EhTInHBJpZLhPbrQ6dMcUuTfN39?usp=sharing).
+
 
 ```
 python train.py \
